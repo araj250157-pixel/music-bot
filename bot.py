@@ -1,7 +1,7 @@
 from telegram.ext import Updater, MessageHandler, Filters
 import requests
 
-BOT_TOKEN = "YAHAN_APNA_TOKEN_DALO"
+BOT_TOKEN = "8253494296:AAGKIM5_MHqdrzEafqaf5NkYNsnC1PvktIY"
 
 def handle_message(update, context):
     query = update.message.text
