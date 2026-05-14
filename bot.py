@@ -5,7 +5,18 @@ from threading import Thread
 TOKEN = "8253494296:AAGKIM5_MHqdrzEafqaf5NkYNsnC1PvktIY"
 
 bot = telebot.TeleBot(TOKEN)
+app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return "Bot is running"
+
+def run():
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 10000)))
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
 @bot.message_handler(commands=['start'])
 def start(message):
 
@@ -73,4 +84,5 @@ def music(message):
         )
 
 print("Bot Running...")
+bot.ikeep_alive()
 bot.infinity_polling()
