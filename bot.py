@@ -1,7 +1,7 @@
 import os
+import requests
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
-import yt_dlp
 from flask import Flask
 from threading import Thread
 
@@ -11,24 +11,14 @@ async def download_song(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.message.text
     await update.message.reply_text("🔍 Searching...")
 
-    ydl_opts = {
-        'format': 'bestaudio[ext=m4a]/bestaudio',
-        'quiet': True,
-        'noplaylist': True,
-        'default_search': 'ytsearch',
-        'nocheckcertificate': True
-    }
-
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(query, download=True)
-            entry = info['entries'][0]
-            file_name = ydl.prepare_filename(entry)
-
-        await update.message.reply_audio(audio=open(file_name, 'rb'))
+        # Free API (no YouTube)
+        url = f"https://api.vevioz.com/api/button/mp3/{query}"
+        
+        await update.message.reply_text(f"🎵 Download here:\n{url}")
 
     except Exception as e:
-        await update.message.reply_text("❌ Error:\n" + str(e))
+        await update.message.reply_text("❌ Error: " + str(e))
 
 # keep alive
 app_flask = Flask('')
@@ -44,6 +34,7 @@ def keep_alive():
     Thread(target=run).start()
 
 keep_alive()
+
 app = ApplicationBuilder().token(BOT_TOKEN).build()
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, download_song))
 
