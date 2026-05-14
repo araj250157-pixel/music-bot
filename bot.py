@@ -12,17 +12,24 @@ async def download_song(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("🔍 Searching...")
 
     ydl_opts = {
-        'format': 'bestaudio/best',
+        'format': 'bestaudio',
         'quiet': True,
-        'noplaylist': True
+        'noplaylist': True,
+        'extract_flat': False
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(f"ytsearch:{query}", download=True)['entries'][0]
-        file_name = ydl.prepare_filename(info)
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(f"ytsearch1:{query}", download=True)
+            entry = info['entries'][0]
+            file_name = ydl.prepare_filename(entry)
 
-    await update.message.reply_audio(audio=open(file_name, 'rb'))
+        await update.message.reply_audio(audio=open(file_name, 'rb'))
 
+    except Exception as e:
+        await update.message.reply_text("❌ Error:\n" + str(e))
+
+# keep alive same
 app_flask = Flask('')
 
 @app_flask.route('/')
@@ -38,4 +45,5 @@ def keep_alive():
 keep_alive()
 app = ApplicationBuilder().token(BOT_TOKEN).build()
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, download_song))
+
 app.run_polling()
