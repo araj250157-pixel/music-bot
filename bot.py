@@ -1,31 +1,33 @@
 from telegram.ext import Updater, MessageHandler, Filters
-import requests
+import yt_dlp
 
 BOT_TOKEN = "8253494296:AAGKIM5_MHqdrzEafqaf5NkYNsnC1PvktIY"
 
-def handle_message(update, context):
+def download_song(update, context):
     query = update.message.text
-
     update.message.reply_text("🔍 Searching...")
 
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'outtmpl': 'song.%(ext)s',
+        'quiet': True,
+    }
+
     try:
-        url = f"https://api.vevioz.com/api/button/mp3/{query}"
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(f"ytsearch:{query}", download=True)
+            file_name = ydl.prepare_filename(info['entries'][0])
 
-        r = requests.get(url)
-
-        with open("song.mp3", "wb") as f:
-            f.write(r.content)
-
-        update.message.reply_audio(open("song.mp3", "rb"))
+        update.message.reply_audio(open(file_name, 'rb'))
 
     except Exception as e:
-        update.message.reply_text("Error: " + str(e))
+        update.message.reply_text("❌ Error: " + str(e))
 
 
 updater = Updater(BOT_TOKEN, use_context=True)
 dp = updater.dispatcher
 
-dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+dp.add_handler(MessageHandler(Filters.text & ~Filters.command, download_song))
 
 updater.start_polling()
 updater.idle()
