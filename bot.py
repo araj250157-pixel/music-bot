@@ -1,6 +1,6 @@
-import telebot
-import yt_dlp
 import os
+from flask import Flask
+from threading import Thread
 
 TOKEN = "8253494296:AAGKIM5_MHqdrzEafqaf5NkYNsnC1PvktIY"
 
