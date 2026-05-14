@@ -12,15 +12,16 @@ async def download_song(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("🔍 Searching...")
 
     ydl_opts = {
-        'format': 'bestaudio',
+        'format': 'bestaudio[ext=m4a]/bestaudio',
         'quiet': True,
         'noplaylist': True,
-        'extract_flat': False
+        'default_search': 'ytsearch',
+        'nocheckcertificate': True
     }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(f"ytsearch1:{query}", download=True)
+            info = ydl.extract_info(query, download=True)
             entry = info['entries'][0]
             file_name = ydl.prepare_filename(entry)
 
@@ -29,7 +30,7 @@ async def download_song(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text("❌ Error:\n" + str(e))
 
-# keep alive same
+# keep alive
 app_flask = Flask('')
 
 @app_flask.route('/')
